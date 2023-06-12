@@ -2,6 +2,8 @@
 
 This repository provides a professional-grade Docker container for the "Bark" GitHub repository. It utilizes FastAPI to create a robust API endpoint that receives prompts as requests and passes them on to the Bark repository for efficient processing. The API then returns the processed results as responses, enabling seamless integration with Bark functionalities. This Docker container enables you to effortlessly deploy and utilize a fully-functional API for Bark.
 
+## Objective
+The main objective is to utilize the Bark repository, which is currently an excellent transformer-based text-to-audio model, officially. We aim to use this model for our own purposes and further enhance it by training and developing it using our own voice. To achieve this, we can host the container on our own server and utilize the API within our organization for our products.
 ## Installation
 
 Follow these steps to install and set up the Bark-Docker:
