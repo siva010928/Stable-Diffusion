@@ -31,6 +31,9 @@ app.add_middleware(
 
 class PromptRequest(BaseModel):
     prompt: str
+    text_temp: float = 0.7
+    waveform_temp: float = 0.7
+    output_full: bool = False
 
 
 class JobStatus(BaseModel):
