@@ -54,44 +54,49 @@ To submit a request, send a POST request to `http://127.0.0.1:8000/audio` with t
 
 **Note:** Only the `prompt` field is required; others are optional.
 
-```json
-{
-    "prompt": "Thank you for your opportunity, and I am impressed by your API!!",
-    "text_temp": 0.7,
-    "waveform_temp": 0.7,
-    "output_full": false
-}
+```curl
+curl --location 'http://127.0.0.1:8000/audio' \
+--header 'Content-Type: application/json' \
+--data '{
+    "prompt": "Mass",
+    "text_temp":0.7,
+    "waveform_temp":0.7,
+    "output_full":"False"
+}'
 ```
 
 The response will contain a job ID and its status:
 
 ```json
 {
-    "job_id": "SCYhsh3dKubaCEHtcwW3AfaLbnq5Ra",
+    "job_id": "ExNg544vfj3MzbTp4wGkdnQGgOUlYo",
     "status": "pending",
-    "track_your_job": "/audio/SCYhsh3dKubaCEHtcwW3AfaLbnq5Ra"
+    "track_your_job": "/audio/ExNg544vfj3MzbTp4wGkdnQGgOUlYo"
 }
 ```
 
 To track the status of a job, send a GET request to `/audio/{job_id}` or click on the `track_your_job` link from the above response:
 
+```curl
+curl --location 'http://127.0.0.1:8000/audio/ExNg544vfj3MzbTp4wGkdnQGgOUlYo'
+```
+
+The response will be like below until the job is completed.
 ```json
 {
-    "job_id": "SCYhsh3dKubaCEHtcwW3AfaLbnq5Ra",
+    "job_id": "ExNg544vfj3MzbTp4wGkdnQGgOUlYo",
     "status": "pending",
     "audio_url": null
 }
 ```
 
-The response will be similar to the above until the job is completed. Once the job is complete,
-
- the response will contain the audio URL:
+Once the job is complete, the response will contain the audio URL:
 
 ```json
 {
-    "job_id": "SCYhsh3dKubaCEHtcwW3AfaLbnq5Ra",
+    "job_id": "ExNg544vfj3MzbTp4wGkdnQGgOUlYo",
     "status": "completed",
-    "audio_url": "/audio_files/SCYhsh3dKubaCEHtcwW3AfaLbnq5Ra.wav"
+    "audio_url": "/audio_files/ExNg544vfj3MzbTp4wGkdnQGgOUlYo.wav"
 }
 ```
 
