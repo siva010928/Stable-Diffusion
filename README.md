@@ -3,7 +3,13 @@
 This repository provides a professional-grade Docker container for the "Bark" GitHub repository. It utilizes FastAPI to create a robust API endpoint that receives prompts as requests and passes them on to the Bark repository for efficient processing. The API then returns the processed results as responses, enabling seamless integration with Bark functionalities. This Docker container enables you to effortlessly deploy and utilize a fully-functional API for Bark.
 
 ## Objective
-The main objective is to utilize the Bark repository, which is currently an excellent transformer-based text-to-audio model, officially. We aim to use this model for our own purposes and further enhance it by training and developing it using our own voice. To achieve this, we can host the container on our own server and utilize the API within our organization for our products.
+The main objective is to utilize the suno-ai/bark repository, a cutting-edge text-to-audio transformer model. This repository includes both a user interface (UI) and API endpoints, allowing us to fully utilize the capabilities of the model. By integrating the API into our organization's products, we can enhance our offerings with high-quality text-to-audio functionality.
+
+To facilitate easy deployment, I have also written a Dockerfile, enabling us to host the model within a container on our server. This ensures efficient and scalable usage of the model. Additionally, the UI I have created provides a user-friendly interface to interact with the model through the appropriate API endpoints.
+
+Furthermore, the model can be further improved by training and developing it with our own voice data. This customization allows us to tailor the output to match our specific requirements and create a unique audio experience.
+
+Overall, the suno-ai/bark repository offers a powerful text-to-audio transformer model, along with the necessary components for easy integration and customization within our organization's products.
 
 ## Sample
 ![img_1.png](img_1.png)
