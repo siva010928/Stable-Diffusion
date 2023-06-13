@@ -127,32 +127,33 @@ async def homepage(request: Request):
                     margin-top: 5px;
                 }
 
+                .job-id,
+                .status {
+                    font-family: Arial, sans-serif;
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                
                 .progress-container {
-                    position: relative;
+                    width: 100%;
                     height: 20px;
-                    background-color: #f0f0f0;
-                    border-radius: 10px;
+                    background-color: #f5f5f5;
+                    border-radius: 5px;
                     overflow: hidden;
                 }
-
+                
                 .progress-bar {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
                     height: 100%;
                     background-color: #007bff;
-                    border-radius: 10px;
                     transition: width 0.5s;
                 }
-
+                
                 .progress-text {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    font-size: 14px;
-                    color: #333;
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
                     font-weight: bold;
+                    margin-top: 5px;
+                    text-align: center;
                 }
 
                 .audio-player {
@@ -251,8 +252,8 @@ async def homepage(request: Request):
                 </div>
                 <button onclick="submitPrompt()" class="btn btn-primary mt-4">Submit</button>
                 <div class="mt-5">
-                    <h3>Job ID: <span id="job_id"></span></h3>
-                    <h3>Status: <span id="status"></span></h3>
+                    <h3 class="job-id">Job ID: <span id="job_id"></span></h3>
+                    <h3 class="status">Status: <span id="status"></span></h3>
                     <div class="progress-container">
                         <div id="loading_percentage" class="progress-bar" role="progressbar"></div>
                         <div id="loading_percentage_text" class="progress-text"></div>
