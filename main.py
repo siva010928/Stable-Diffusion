@@ -197,6 +197,9 @@ async def homepage(request: Request):
                     const progressBar = $("#loading_percentage");
                     const progressText = $("#loading_percentage_text");
                 
+                    let currentPercentage = 0;
+                    progressText.text(currentPercentage + "%");
+                
                     const intervalId = setInterval(function() {
                         $.get("/audio/" + jobId, function(data) {
                             $("#status").text(data.status);
@@ -208,9 +211,10 @@ async def homepage(request: Request):
                                     showAudioPlayer(data.audio_url);
                                 });
                             } else {
-                                const loadingPercentage = Math.min(Math.round(data.loading_percentage * 100), 100);
-                                progressBar.animate({ width: loadingPercentage + "%" }, 500);
-                                progressText.text(loadingPercentage + "%");
+                                currentPercentage += 2;
+                                currentPercentage = Math.min(currentPercentage, 100);
+                                progressBar.animate({ width: currentPercentage + "%" }, 500);
+                                progressText.text(currentPercentage + "%");
                             }
                         });
                     }, 5000);
