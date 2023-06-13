@@ -4,6 +4,10 @@ This repository provides a professional-grade Docker container for the "Bark" Gi
 
 ## Objective
 The main objective is to utilize the Bark repository, which is currently an excellent transformer-based text-to-audio model, officially. We aim to use this model for our own purposes and further enhance it by training and developing it using our own voice. To achieve this, we can host the container on our own server and utilize the API within our organization for our products.
+
+## Sample
+![img.png](img.png)
+
 ## Installation
 
 Follow these steps to install and set up the Bark-Docker:

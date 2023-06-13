@@ -108,12 +108,66 @@ async def homepage(request: Request):
     <html>
         <head>
             <title>FastAPI with UI</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+            <style>
+                .container {
+                    max-width: 600px;
+                    margin: 40px auto;
+                    text-align: center;
+                }
+
+                .form-group {
+                    margin-bottom: 20px;
+                }
+
+                .help-text {
+                    font-size: 12px;
+                    color: #888;
+                    margin-top: 5px;
+                }
+
+                .progress-container {
+                    position: relative;
+                    height: 20px;
+                    background-color: #f0f0f0;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+
+                .progress-bar {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    background-color: #007bff;
+                    border-radius: 10px;
+                    transition: width 0.5s;
+                }
+
+                .progress-text {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 14px;
+                    color: #333;
+                    font-weight: bold;
+                }
+
+                .audio-player {
+                    margin-top: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+            </style>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
                 function submitPrompt() {
                     const prompt = $("#prompt").val();
-                    const textTemp = parseFloat($("#text_temp").val());
-                    const waveformTemp = parseFloat($("#waveform_temp").val());
+                    const textTemp = parseFloat($("#text_temp").val()) || 0.7;
+                    const waveformTemp = parseFloat($("#waveform_temp").val()) || 0.7;
                     const outputFull = $("#output_full").is(":checked");
 
                     const data = {
@@ -131,7 +185,6 @@ async def homepage(request: Request):
                         success: function(data) {
                             $("#job_id").text(data.job_id);
                             $("#status").text(data.status);
-                            $("#audio_url").text(data.audio_url);
                             trackJobStatus(data.job_id);
                         },
                         error: function() {
@@ -141,45 +194,67 @@ async def homepage(request: Request):
                 }
 
                 function trackJobStatus(jobId) {
+                    const progressBar = $("#loading_percentage");
+                    const progressText = $("#loading_percentage_text");
+                
                     const intervalId = setInterval(function() {
                         $.get("/audio/" + jobId, function(data) {
                             $("#status").text(data.status);
-                            $("#loading_percentage").text(data.loading_percentage);
-
+                
                             if (data.status === "completed") {
                                 clearInterval(intervalId);
-                                $("#audio_url").html(`<audio controls><source src="${data.audio_url}" type="audio/wav"></audio>`);
+                                progressBar.animate({ width: "100%" }, 500, function() {
+                                    progressText.text("100%");
+                                    showAudioPlayer(data.audio_url);
+                                });
+                            } else {
+                                const loadingPercentage = Math.min(Math.round(data.loading_percentage * 100), 100);
+                                progressBar.animate({ width: loadingPercentage + "%" }, 500);
+                                progressText.text(loadingPercentage + "%");
                             }
                         });
-                    }, 2000);
+                    }, 5000);
+                }
+
+
+                function showAudioPlayer(audioUrl) {
+                    const audioPlayer = `<audio controls><source src="${audioUrl}" type="audio/wav"></audio>`;
+                    $("#audio_player").html(audioPlayer);
                 }
             </script>
         </head>
         <body>
-            <h1>FastAPI with UI</h1>
-            <div>
-                <label for="prompt">Prompt:</label>
-                <textarea id="prompt" rows="5" cols="50"></textarea>
-            </div>
-            <div>
-                <label for="text_temp">Text Temperature:</label>
-                <input type="number" id="text_temp" step="0.1" value="0.7">
-            </div>
-            <div>
-                <label for="waveform_temp">Waveform Temperature:</label>
-                <input type="number" id="waveform_temp" step="0.1" value="0.7">
-            </div>
-            <div>
-                <label for="output_full">Output Full:</label>
-                <input type="checkbox" id="output_full">
-            </div>
-            <div>
-                <button onclick="submitPrompt()">Submit</button>
-            </div>
-            <div>
-                <h3>Job ID: <span id="job_id"></span></h3>
-                <h3>Status: <span id="status"></span></h3>
-                <h3>Audio: <span id="audio_url"></span></h3>
+            <div class="container">
+                <h1 class="mb-4">FastAPI with UI</h1>
+                <div class="form-group">
+                    <label for="prompt">Prompt:</label>
+                    <textarea id="prompt" class="form-control" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="text_temp">Text Temperature:</label>
+                    <input type="number" id="text_temp" step="0.1" class="form-control" placeholder="0.7">
+                    <p class="help-text">Generation temperature (1.0 more diverse, 0.0 more conservative)</p>
+                </div>
+                <div class="form-group">
+                    <label for="waveform_temp">Waveform Temperature:</label>
+                    <input type="number" id="waveform_temp" step="0.1" class="form-control" placeholder="0.7">
+                    <p class="help-text">Generation temperature (1.0 more diverse, 0.0 more conservative)</p>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" id="output_full" class="form-check-input">
+                    <label for="output_full" class="form-check-label">Output Full:</label>
+                    <p class="help-text">Return full generation as a .npz file to be used as a history prompt</p>
+                </div>
+                <button onclick="submitPrompt()" class="btn btn-primary mt-4">Submit</button>
+                <div class="mt-5">
+                    <h3>Job ID: <span id="job_id"></span></h3>
+                    <h3>Status: <span id="status"></span></h3>
+                    <div class="progress-container">
+                        <div id="loading_percentage" class="progress-bar" role="progressbar"></div>
+                        <div id="loading_percentage_text" class="progress-text"></div>
+                    </div>
+                    <div id="audio_player" class="audio-player"></div>
+                </div>
             </div>
         </body>
     </html>
