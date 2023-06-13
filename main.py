@@ -8,8 +8,8 @@ from IPython.display import Audio
 import uvicorn
 import numpy as np
 from pydantic import BaseModel
-from fastapi import FastAPI, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, BackgroundTasks, Request
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from pydub import AudioSegment
 import os
 from fastapi.staticfiles import StaticFiles
@@ -100,6 +100,91 @@ async def get_audio_status(job_id: str):
         audio_filename = job_id + ".wav"
         audio_url = os.path.join("/audio_files", audio_filename)
         return {"job_id": job_id, "status": "completed", "audio_url": audio_url}
+
+
+@app.get("/")
+async def homepage(request: Request):
+    return HTMLResponse("""
+    <html>
+        <head>
+            <title>FastAPI with UI</title>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script>
+                function submitPrompt() {
+                    const prompt = $("#prompt").val();
+                    const textTemp = parseFloat($("#text_temp").val());
+                    const waveformTemp = parseFloat($("#waveform_temp").val());
+                    const outputFull = $("#output_full").is(":checked");
+
+                    const data = {
+                        prompt: prompt,
+                        text_temp: textTemp,
+                        waveform_temp: waveformTemp,
+                        output_full: outputFull
+                    };
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/audio",
+                        contentType: "application/json",
+                        data: JSON.stringify(data),
+                        success: function(data) {
+                            $("#job_id").text(data.job_id);
+                            $("#status").text(data.status);
+                            $("#audio_url").text(data.audio_url);
+                            trackJobStatus(data.job_id);
+                        },
+                        error: function() {
+                            alert("An error occurred while submitting the prompt.");
+                        }
+                    });
+                }
+
+                function trackJobStatus(jobId) {
+                    const intervalId = setInterval(function() {
+                        $.get("/audio/" + jobId, function(data) {
+                            $("#status").text(data.status);
+                            $("#loading_percentage").text(data.loading_percentage);
+
+                            if (data.status === "completed") {
+                                clearInterval(intervalId);
+                                $("#audio_url").html(`<audio controls><source src="${data.audio_url}" type="audio/wav"></audio>`);
+                            }
+                        });
+                    }, 2000);
+                }
+            </script>
+        </head>
+        <body>
+            <h1>FastAPI with UI</h1>
+            <div>
+                <label for="prompt">Prompt:</label>
+                <textarea id="prompt" rows="5" cols="50"></textarea>
+            </div>
+            <div>
+                <label for="text_temp">Text Temperature:</label>
+                <input type="number" id="text_temp" step="0.1" value="0.7">
+            </div>
+            <div>
+                <label for="waveform_temp">Waveform Temperature:</label>
+                <input type="number" id="waveform_temp" step="0.1" value="0.7">
+            </div>
+            <div>
+                <label for="output_full">Output Full:</label>
+                <input type="checkbox" id="output_full">
+            </div>
+            <div>
+                <button onclick="submitPrompt()">Submit</button>
+            </div>
+            <div>
+                <h3>Job ID: <span id="job_id"></span></h3>
+                <h3>Status: <span id="status"></span></h3>
+                <h3>Audio: <span id="audio_url"></span></h3>
+            </div>
+        </body>
+    </html>
+    """)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
